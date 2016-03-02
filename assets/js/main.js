@@ -4,14 +4,19 @@ var gameTimer = 0;
 var state = INIT;
 
 function loop() {
-    if (filesLoaded) {
-        switch (state) {
-            case INIT:
-
-                break;
-        }
-        stage.update();
+    if(p1Direction == 'left'){
+        p1.paddleDisplay.rotation += p1.speed;
+    } else if(p1Direction == 'right'){
+        p1.paddleDisplay.rotation -= p1.speed;
     }
+
+    if(p2Direction == 'left'){
+        p2.paddleDisplay.rotation += p2.speed;
+    } else if(p2Direction == 'right'){
+        p2.paddleDisplay.rotation -= p2.speed;
+    }
+
+    stage.update();
 }
 
 function resetGameTimer() {
@@ -29,3 +34,5 @@ function runGameTimer() {
 
 createjs.Ticker.addEventListener("tick", loop);
 createjs.Ticker.setFPS(FPS);
+
+
