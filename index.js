@@ -9,7 +9,17 @@ var KEYCODE_LEFT = 37,
     KEYCODE_ENTER = 13,
     KEYCODE_SPACE = 32,
     KEYCODE_ESCAPE = 27,
+    KEYCODE_A = 65,
+    KEYCODE_S = 83,
     KEYCODE_P = 80;
+
+var board;
+
+var p1;
+var p1Direction;
+
+var p2;
+var p2Direction;
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -27,14 +37,11 @@ function drawText(x, y, size, color, stroke) {
         myText2.color = color;
         myText2.x = x; //positions the text
         myText2.y = y;
-
-        stage.addChild(myText, myText2);
         return {text: myText2, textStroke: myText};
     } else {
         var myText = new createjs.Text('', size + " 'Press Start 2P'", color || "#000");  //creates text object
         myText.x = x; //positions the text
         myText.y = y;
-        stage.addChild(myText);  //adds the text object to the stage
 
         return myText;
     }
@@ -45,16 +52,34 @@ function drawRectStroke(x, y, width, height, color) {
     myRect.graphics.setStrokeStyle(1);
     myRect.graphics.beginStroke(color).drawRect(x, y, width, height);
 
-    stage.addChild(myRect);
     return myRect
 }
 
-function drawRect(x, y, width, height, color) {
+function drawRect(x, y, regx, regy, width, height, color) {
     var myRect = new createjs.Shape();
-    myRect.graphics.beginFill(color).drawRect(x, y, width, height);
+    myRect.graphics.beginFill(color).drawRect(0, 0, width, height);
 
-    stage.addChild(myRect);
+    myRect.regX = regx;
+    myRect.regY = regy;
+
+    myRect.x = x;
+    myRect.y = y;
+
     return myRect
+}
+
+function drawCircle(x, y, r, color) {
+    var myCirc = new createjs.Shape();
+    myCirc.graphics.beginFill(color || '#000').drawCircle(x, y, r);
+    return myCirc;
+}
+
+function drawCircleStroke(x, y, r, color, thickness) {
+    var myCircStroke = new createjs.Shape();
+    var g = myCircStroke.graphics;
+    g.setStrokeStyle(5);
+    myCircStroke.graphics.beginStroke(color || "#000").drawCircle(x, y, r);
+    return myCircStroke;
 }
 
 function createHitBox(objectToHit) {
@@ -71,7 +96,6 @@ function addMenuCursor(objectToAddCursor) {
     cursor.y = objectToAddCursor.y - 10;
     cursor.visible = false;
 
-    stage.addChild(cursor);
     return cursor;
 }
 
@@ -180,15 +204,23 @@ function keyboardInit() {
         }  //browser compatibility
         switch (evt.keyCode) {
             case KEYCODE_LEFT:
+                p1Direction = 'left';
                 return false;
             case KEYCODE_RIGHT:
+                p1Direction = 'right';
                 return false;
             case KEYCODE_UP:
                 return false;
             case KEYCODE_DOWN:
                 return false;
+            case KEYCODE_A:
+                p2Direction = 'left';
+                break;
             case KEYCODE_P:
                 return false;
+            case KEYCODE_S:
+                p2Direction = 'right';
+                break;
             case KEYCODE_ESCAPE:
                 break;
             case KEYCODE_SPACE:
@@ -204,8 +236,10 @@ function keyboardInit() {
         }  //browser compatibility
         switch (evt.keyCode) {
             case KEYCODE_LEFT:
+                p1Direction = 'none';
                 break;
             case KEYCODE_RIGHT:
+                p1Direction = 'none';
                 break;
             case KEYCODE_UP:
                 break;
@@ -214,6 +248,12 @@ function keyboardInit() {
             case KEYCODE_SPACE:
                 break;
             case KEYCODE_ENTER:
+                break;
+            case KEYCODE_A:
+                p2Direction = 'none';
+                break;
+            case KEYCODE_S:
+                p2Direction = 'none';
                 break;
         }
     }
@@ -233,8 +273,14 @@ function setupCanvas() {
 function setupManifest() {
 
     manifest = [{
-        src: "",
-        id: ""
+        src: "assets/js/models/Board.js",
+        id: "boardObject"
+    }, {
+        src: "assets/js/models/Paddle.js",
+        id: "paddleObject"
+    }, {
+        src: "assets/js/main.js",
+        id: "mainjs"
     }];
 }
 
@@ -270,6 +316,15 @@ function handleFileProgress(event) {
 
 function loadComplete(event) {
     filesLoaded = true;
+
+    board = new Board(drawCircleStroke(400, 300, 250, 5));
+    stage.addChild(board.boardDisplay);
+
+    p1 = new Paddle(drawRect(400, 300, 50, 260, 100, 25, 'rgba(255,0,0,.7)'));
+    stage.addChild(p1.paddleDisplay);
+
+    p2 = new Paddle(drawRect(400, 300, 50, 260, 100, 25, 'rgba(0,0,255,.7)'));
+    stage.addChild(p2.paddleDisplay);
 
     //remove progress bar
     progressBar.visible = false;
