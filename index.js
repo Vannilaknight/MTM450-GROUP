@@ -10,19 +10,83 @@ var KEYCODE_LEFT = 37,
     KEYCODE_SPACE = 32,
     KEYCODE_ESCAPE = 27,
     KEYCODE_A = 65,
+    KEYCODE_B = 66,
+    KEYCODE_G = 71,
+    KEYCODE_H = 72,
+    KEYCODE_I = 73,
+    KEYCODE_K = 75,
+    KEYCODE_L = 76,
+    KEYCODE_O = 79,
     KEYCODE_S = 83,
-    KEYCODE_P = 80;
+    KEYCODE_P = 80,
+    KEYCODE_V = 86,
+    KEYCODE_X = 88,
+    KEYCODE_Z = 90,
+    KEYCODE_COMMA = 188,
+    KEYCODE_PERIOD = 190;
+
+var totalWidth = 1200,
+    totalHeight = 900;
+
+var xCenter = totalWidth / 2;
+var yCenter = totalHeight / 2;
 
 var board;
+var board2;
+
+var ball;
+var ballStage;
+var redB;
+var blueB;
+var greenB;
+var yellowB;
 
 var p1;
-var p1Direction;
+var p1Left;
+var p1Right;
 
 var p2;
-var p2Direction;
+var p2Left;
+var p2Right;
+
+var p3;
+var p3Left;
+var p3Right;
+
+var p4;
+var p4Left;
+var p4Right;
+
+var p5;
+var p5Left;
+var p5Right;
+
+var p6;
+var p6Left;
+var p6Right;
+
+var p7;
+var p7Left;
+var p7Right;
+
+var p8;
+var p8Left;
+var p8Right;
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function toBasicDegree(angle) {
+    return angle % 360;
+}
+
+function toDegrees(angle) {
+    return angle * (180 / Math.PI);
+}
+
+function toRadians(angle) {
+    return angle * (Math.PI / 180);
 }
 
 function drawText(x, y, size, color, stroke) {
@@ -55,6 +119,27 @@ function drawRectStroke(x, y, width, height, color) {
     return myRect
 }
 
+function drawImage(x, y, regx, regy, asset) {
+    var myImg = new createjs.Bitmap(asset);
+
+    myImg.regX = regx || 0;
+    myImg.regY = regy || 0;
+
+    myImg.x = x;
+    myImg.y = y;
+
+
+    return myImg;
+}
+
+function drawSprite(x, y, asset) {
+    asset.x = x;
+    asset.y = y;
+    asset.goToAndPlay("gray");
+
+    return asset;
+}
+
 function drawRect(x, y, regx, regy, width, height, color) {
     var myRect = new createjs.Shape();
     myRect.graphics.beginFill(color).drawRect(0, 0, width, height);
@@ -65,6 +150,11 @@ function drawRect(x, y, regx, regy, width, height, color) {
     myRect.x = x;
     myRect.y = y;
 
+    var hitBox = new createjs.Shape();
+    hitBox.graphics.beginFill("#000000").drawRect(0, 0, width, height);
+
+    myRect.hitArea = hitBox;
+
     return myRect
 }
 
@@ -74,7 +164,7 @@ function drawCircle(x, y, r, color) {
     return myCirc;
 }
 
-function drawCircleStroke(x, y, r, color, thickness) {
+function drawCircleStroke(x, y, r, color) {
     var myCircStroke = new createjs.Shape();
     var g = myCircStroke.graphics;
     g.setStrokeStyle(5);
@@ -203,30 +293,92 @@ function keyboardInit() {
             var evt = window.event;
         }  //browser compatibility
         switch (evt.keyCode) {
-            case KEYCODE_LEFT:
-                p1Direction = 'left';
-                return false;
-            case KEYCODE_RIGHT:
-                p1Direction = 'right';
-                return false;
+
             case KEYCODE_UP:
                 return false;
             case KEYCODE_DOWN:
                 return false;
+
+            //P1
+
+            case KEYCODE_LEFT:
+                p1Left = true;
+                break;
+            case KEYCODE_RIGHT:
+                p1Right = true;
+                break;
+
+            //P2
+
             case KEYCODE_A:
-                p2Direction = 'left';
+                p2Left = true;
                 break;
-            case KEYCODE_P:
-                return false;
             case KEYCODE_S:
-                p2Direction = 'right';
+                p2Right = true;
                 break;
+
+            //P7
+
+            case KEYCODE_G:
+                p7Left = true;
+                break;
+            case KEYCODE_H:
+                p7Right = true;
+                break;
+
+            //P5
+
+            case KEYCODE_COMMA:
+                p5Left = true;
+                break;
+            case KEYCODE_PERIOD:
+                p5Right = true;
+                break;
+
+            //P4
+
+            case KEYCODE_K:
+                p4Left = true;
+                break;
+            case KEYCODE_L:
+                p4Right = true;
+                break;
+
+            //P3
+
+            case KEYCODE_B:
+                p3Right = true;
+                break;
+            case KEYCODE_V:
+                p3Left = true;
+                break;
+
+            //P6
+
+            case KEYCODE_Z:
+                p6Left = true;
+                break;
+            case KEYCODE_X:
+                p6Right = true;
+                break;
+
+            //P8
+
+            case KEYCODE_I:
+                p8Left = true;
+                break;
+            case KEYCODE_O:
+                p8Right = true;
+                break;
+
             case KEYCODE_ESCAPE:
                 break;
             case KEYCODE_SPACE:
                 break;
             case KEYCODE_ENTER:
                 break;
+
+
         }
     }
 
@@ -235,12 +387,7 @@ function keyboardInit() {
             var evt = window.event;
         }  //browser compatibility
         switch (evt.keyCode) {
-            case KEYCODE_LEFT:
-                p1Direction = 'none';
-                break;
-            case KEYCODE_RIGHT:
-                p1Direction = 'none';
-                break;
+
             case KEYCODE_UP:
                 break;
             case KEYCODE_DOWN:
@@ -249,11 +396,78 @@ function keyboardInit() {
                 break;
             case KEYCODE_ENTER:
                 break;
-            case KEYCODE_A:
-                p2Direction = 'none';
+
+            //P1
+
+            case KEYCODE_LEFT:
+                p1Left = false;
                 break;
+            case KEYCODE_RIGHT:
+                p1Right = false;
+                break;
+
+            //P2
+
             case KEYCODE_S:
-                p2Direction = 'none';
+                p2Right = false;
+                break;
+            case KEYCODE_A:
+                p2Left = false;
+                break;
+
+
+            //P7
+
+            case KEYCODE_G:
+                p7Left = false;
+                break;
+            case KEYCODE_H:
+                p7Right = false;
+                break;
+
+            //P4
+
+            case KEYCODE_K:
+                p4Left = false;
+                break;
+            case KEYCODE_L:
+                p4Right = false;
+                break;
+
+            //P3
+
+            case KEYCODE_B:
+                p3Right = false;
+                break;
+            case KEYCODE_V:
+                p3Left = false;
+                break;
+
+            //P6
+
+            case KEYCODE_Z:
+                p6Left = false;
+                break;
+            case KEYCODE_X:
+                p6Right = false;
+                break;
+
+            //P5
+
+            case KEYCODE_COMMA:
+                p5Left = false;
+                break;
+            case KEYCODE_PERIOD:
+                p5Right = false;
+                break;
+
+            //P8
+
+            case KEYCODE_I:
+                p8Left = false;
+                break;
+            case KEYCODE_O:
+                p8Right = false;
                 break;
         }
     }
@@ -264,8 +478,8 @@ function keyboardInit() {
 
 function setupCanvas() {
     var canvas = document.getElementById("game"); //get canvas with id='game'
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = 1200;
+    canvas.height = 900;
     stage = new createjs.Stage(canvas);
 }
 
@@ -273,11 +487,44 @@ function setupCanvas() {
 function setupManifest() {
 
     manifest = [{
+        src: "assets/js/ndgmr.Collision.js",
+        id: "ndgmrCollision"
+    },{
         src: "assets/js/models/Board.js",
         id: "boardObject"
     }, {
+        src: "assets/js/models/Ball.js",
+        id: "ballObject"
+    }, {
         src: "assets/js/models/Paddle.js",
         id: "paddleObject"
+    }, {
+        src: "assets/images/yellowB.png",
+        id: "yellowB"
+    }, {
+        src: "assets/images/greenB.png",
+        id: "greenB"
+    }, {
+        src: "assets/images/redB.png",
+        id: "redB"
+    }, {
+        src: "assets/images/blueB.png",
+        id: "blueB"
+    }, {
+        src: "assets/images/whiteB.png",
+        id: "whiteB"
+    }, {
+        src: "assets/images/yellowpdl.png",
+        id: "yellowpdl"
+    }, {
+        src: "assets/images/greenpdl.png",
+        id: "greenpdl"
+    }, {
+        src: "assets/images/redpdl.png",
+        id: "redpdl"
+    }, {
+        src: "assets/images/bluepdl.png",
+        id: "bluepdl"
     }, {
         src: "assets/js/main.js",
         id: "mainjs"
@@ -317,14 +564,59 @@ function handleFileProgress(event) {
 function loadComplete(event) {
     filesLoaded = true;
 
-    board = new Board(drawCircleStroke(400, 300, 250, 5));
+    board = new Board(drawCircleStroke(xCenter, yCenter, 250));
+    board2 = new Board(drawCircleStroke(xCenter, yCenter, 400));
     stage.addChild(board.boardDisplay);
+    stage.addChild(board2.boardDisplay);
 
-    p1 = new Paddle(drawRect(400, 300, 50, 260, 100, 25, 'rgba(255,0,0,.7)'));
+    p1 = new Paddle(drawImage(xCenter, yCenter, 50, 260, preload.getResult("redpdl")));
+    p1.controller = 'red';
     stage.addChild(p1.paddleDisplay);
 
-    p2 = new Paddle(drawRect(400, 300, 50, 260, 100, 25, 'rgba(0,0,255,.7)'));
+    p2 = new Paddle(drawImage(xCenter, yCenter, 50, 260, preload.getResult("bluepdl")));
+    p2.controller = 'blue';
+    p2.paddleDisplay.rotation = 180;
     stage.addChild(p2.paddleDisplay);
+
+    p3 = new Paddle(drawImage(xCenter, yCenter, 50, 260, preload.getResult("greenpdl")));
+    p3.controller = 'green';
+    p3.paddleDisplay.rotation = 90;
+    stage.addChild(p3.paddleDisplay);
+
+    p4 = new Paddle(drawImage(xCenter, yCenter, 50, 260, preload.getResult("yellowpdl")));
+    p4.controller = 'yellow';
+    p4.paddleDisplay.rotation = 270;
+    stage.addChild(p4.paddleDisplay);
+
+    p5 = new Paddle(drawImage(xCenter, yCenter, 50, 410, preload.getResult("redpdl")));
+    p5.controller = 'red';
+    p5.paddleDisplay.rotation = 180;
+    stage.addChild(p5.paddleDisplay);
+
+    p6 = new Paddle(drawImage(xCenter, yCenter, 50, 410, preload.getResult("bluepdl")));
+    p6.controller = 'blue';
+    stage.addChild(p6.paddleDisplay);
+
+    p7 = new Paddle(drawImage(xCenter, yCenter, 50, 410, preload.getResult("greenpdl")));
+    p7.controller = 'green';
+    p7.paddleDisplay.rotation = 270;
+    stage.addChild(p7.paddleDisplay);
+
+    p8 = new Paddle(drawImage(xCenter, yCenter, 50, 410, preload.getResult("yellowpdl")));
+    p8.controller = 'yellow';
+    p8.paddleDisplay.rotation = 90;
+    stage.addChild(p8.paddleDisplay);
+
+    redB = drawImage(xCenter, yCenter, 10, 10, preload.getResult("redB"))
+    blueB = drawImage(xCenter, yCenter, 10, 10, preload.getResult("blueB"))
+    greenB = drawImage(xCenter, yCenter, 10, 10, preload.getResult("greenB"))
+    yellowB = drawImage(xCenter, yCenter, 10, 10, preload.getResult("yellowB"))
+
+    //ball = new Ball(drawCircle(xCenter, yCenter, 10, "#fff"));
+    //ballStage = stage.addChild(ball.ballDisplay);
+
+    ball = new Ball(drawImage(xCenter, yCenter, 10, 10, preload.getResult("whiteB")));
+    ballStage = stage.addChild(ball.ballDisplay);
 
     //remove progress bar
     progressBar.visible = false;
