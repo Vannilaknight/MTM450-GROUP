@@ -1,8 +1,8 @@
 var Ball = function (display) {
     this.ballDisplay = display;
-    this.totalSpeed = 3;
-    this.xSpeed = 5;
-    this.ySpeed = 0;
+    this.totalSpeed = 2;
+    this.xSpeed = ((Math.random() < 0.5 ? -1 : 1) * 2);
+    this.ySpeed = ((Math.random() < 0.5 ? -1 : 1) * 2);
     this.controller;
 
     this.setController = function (controller) {
@@ -15,6 +15,8 @@ var Ball = function (display) {
             this.ballDisplay.image = greenB.image;
         } else if(controller == 'yellow'){
             this.ballDisplay.image = yellowB.image;
+        } else if(controller == 'none'){
+            this.ballDisplay.image = whiteB.image;
         }
     };
 };

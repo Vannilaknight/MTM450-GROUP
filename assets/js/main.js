@@ -1,7 +1,8 @@
-var FPS = 30;
+var FPS = 60;
 var frameCount = 0;
 var gameTimer = 0;
 var state = INIT;
+var bluePoints = 0, redPoints = 0, greenPoints = 0, yellowPoints = 0;
 var p1Hit, p2Hit, p3Hit, p4Hit;
 
 function setVarsPerPaddle(p) {
@@ -22,7 +23,6 @@ function checkHit(p) {
     if (ndgmr.checkRectCollision(ball.ballDisplay, p.paddleDisplay)) {
         ball.xSpeed = ball.totalSpeed * Math.cos(toRadians(p.xCenter));
         ball.ySpeed = ball.totalSpeed * -Math.sin(toRadians(p.yCenter));
-        console.log(ball.controller + ', ' + p.controller);
         if (ball.controller == p.controller) {
             console.log('Speed up')
             ball.totalSpeed += 1;
@@ -79,6 +79,36 @@ function loop() {
     checkHit(p7);
     checkHit(p8);
 
+    var ballAndStage = ndgmr.checkRectCollision(ball.ballDisplay, stage);
+
+    if(ballAndStage.x < 0 || ballAndStage.y < 0 || ballAndStage.x > 1200 || ballAndStage.y > 900){
+        ball.ballDisplay.x = 600;
+        ball.ballDisplay.y = 450;
+        ball.totalSpeed = 3;
+        ball.xSpeed = ((Math.random() < 0.5 ? -1 : 1) * 3);
+        ball.ySpeed = ((Math.random() < 0.5 ? -1 : 1) * 3);
+
+        switch (ball.controller){
+            case 'red':
+                redPoints++;
+                redPointVal.text = redPoints;
+                break;
+            case 'blue':
+                bluePoints++;
+                bluePointVal.text = bluePoints;
+                break;
+            case 'yellow':
+                yellowPoints++;
+                yellowPointVal.text = yellowPoints;
+                break;
+            case 'green':
+                greenPoints++;
+                greenPointVal.text = greenPoints;
+                break;
+        }
+
+        ball.setController('none');
+    }
     stage.update();
 }
 
