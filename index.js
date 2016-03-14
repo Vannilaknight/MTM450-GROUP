@@ -47,6 +47,11 @@ var bluePointVal;
 var greenPointVal;
 var yellowPointVal;
 
+var powerUp1;
+var powerUp2;
+var powerUp3;
+var powerUp4;
+
 var p1;
 var p1Left;
 var p1Right;
@@ -225,6 +230,9 @@ var menuSelect;
  ** IMAGE ASSETS
  */
 
+/*
+ ** POWER ASSETS    
+ */ 
 
 /*
  ** menu
@@ -498,12 +506,36 @@ function setupManifest() {
     }, {
         src: "assets/js/models/Board.js",
         id: "boardObject"
+    },  {
+        src: "assets/audio/shine.wav",
+        id: "shine"
+    }, {
+        src: "assets/audio/compreet.wav",
+        id: "complete"
+    }, {
+        src: "assets/audio/game1.mp3",
+        id: "gameMusic"
+    },  {
+        src: "assets/audio/toriyah.wav",
+        id: "fox"
+    }, {
+        src: "assets/audio/haaa.wav",
+        id: "ha"
+    }, {
+        src: "assets/audio/utah.wav",
+        id: "utah"
     }, {
         src: "assets/js/models/Ball.js",
         id: "ballObject"
     }, {
+        src: "assets/js/models/Power.js",
+        id: "powerObject"
+    }, {
         src: "assets/js/models/Paddle.js",
         id: "paddleObject"
+    }, {
+        src: "assets/images/shine.png",
+        id: "shiny"
     }, {
         src: "assets/images/yellowB.png",
         id: "yellowB"
@@ -571,8 +603,25 @@ function handleFileProgress(event) {
 
 
 function loadComplete(event) {
+    createjs.Sound.play('gameMusic', {loop: -1});
     filesLoaded = true;
 
+    powerUp1 = new Power(drawImage(xCenter, yCenter, 50, 335, preload.getResult("shiny")), 'ballSlow');
+    powerUp1.powerDisplay.visible = false;
+    stage.addChild(powerUp1.powerDisplay);
+    
+    powerUp2 = new Power(drawImage(xCenter, yCenter, 50, 335, preload.getResult("shiny")), 'ballFast');
+    powerUp2.powerDisplay.visible = false;
+    stage.addChild(powerUp2.powerDisplay);
+    
+    powerUp3 = new Power(drawImage(xCenter, yCenter, 50, 335, preload.getResult("shiny")), 'enemySlow');
+    powerUp3.powerDisplay.visible = false;
+    stage.addChild(powerUp3.powerDisplay);
+    
+    powerUp4 = new Power(drawImage(xCenter, yCenter, 50, 335, preload.getResult("shiny")), 'paddleFast');
+    powerUp4.powerDisplay.visible = false;
+    stage.addChild(powerUp4.powerDisplay);
+        
     //var background = drawImage(0,0,0,0,preload.getResult("back"));
     //stage.addChild(background);
 
