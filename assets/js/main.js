@@ -232,7 +232,7 @@ function resetGameTimer() {
 }
 
 function resetPowerUps() {
-    //call this to fix all the power up changes.
+    //call this to fix all the power up changes.    
     ball.totalSpeed = 5;
     p1.speed = 5;
     p2.speed = 5;
